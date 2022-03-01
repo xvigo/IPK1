@@ -186,8 +186,8 @@ void get_response(std::stringstream& response, char *buffer)
     const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain;\r\nContent-Length: 25\r\n\r\n500 Internal Server Error";
 
     Command command = NONE;
-    char delim = ' ';
-    char *command_str = strtok(buffer, &delim);
+    char delim[] = " ";
+    char *command_str = strtok(buffer, delim);
     if(command_str == nullptr)
     {
         command = NONE;
@@ -208,10 +208,11 @@ void get_response(std::stringstream& response, char *buffer)
     }
 
 
-    char *param_str = strtok(nullptr, &delim);
+    char *param_str = strtok(nullptr, delim);
     if(param_str == nullptr)
     {
         response << bad_request;
+        return;
     }
     else if (!strcmp(param_str, "/hostname"))
     {
@@ -228,6 +229,7 @@ void get_response(std::stringstream& response, char *buffer)
                 response << hostname;
             }
         }
+        return;
     }
     else if (!strcmp(param_str, "/cpu-name"))
     {
@@ -243,7 +245,8 @@ void get_response(std::stringstream& response, char *buffer)
             {
                 response << cpu_name;
             }
-        }    
+        }
+        return;
     }
     else if (!strcmp(param_str, "/load"))
     {
@@ -262,12 +265,13 @@ void get_response(std::stringstream& response, char *buffer)
                 response << str_cpu_load;
             }
         }
+        return;
     }
     else
     {
         response << bad_request;
+        return;
     }
-    return;
 }
 
 #define DEFAULT 0
