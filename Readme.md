@@ -1,10 +1,11 @@
-# IPK Projekt 1
-
-C++ server komunikující prostřednictvím protokolu HTTP poskytujcí informace o systému.
+# VUT FIT - IPK Projekt 1
+## Autor : Vilém Gottwald (xgottw07)
+## Popis
+Server v jazyce C++ komunikující prostřednictvím protokolu HTTP, který na základě dotazů poskytuje informace o systému.
 
 Konkrétně lze od serveru získat následující informace:
  * doménové jméno 
- * název CPU 
+ * název modelu CPU 
  * aktuální zatížení CPU
 
 ## Kompilace
@@ -27,7 +28,7 @@ SERVER: listening on port 4444
 
 ## Použití
 Se serverem je možno komunikovat pomocí webového prohlížeče nebo pomocí nástrojů typu wget a curl.
-Server umí zpracovat následující dotazy zaslané příkazem __GET__:
+Server umí zpracovat následující dotazy zaslané příkazem __GET__ (případně __HEAD__):
 
 1. Získání doménového jména
 

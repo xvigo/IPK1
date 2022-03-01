@@ -1,3 +1,4 @@
+#IPK projekt 1 - Vilem Gottwald (xgottw07)
 CC=g++
 CPPFLAGSERROR= -Wall -Wextra -Werror -pedantic
 SRC_FILE= server.cpp

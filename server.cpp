@@ -99,7 +99,7 @@ int get_cpu_load()
  */
 bool get_hostname(string *hostname)
 {
-    std::ifstream stat_f ("/proc/sys/kernel/hostnameffsgs");
+    std::ifstream stat_f ("/proc/sys/kernel/hostname");
     if (!stat_f.is_open())
     {
         return false;
@@ -165,26 +165,55 @@ unsigned short get_port_from_cla(int argc, char **argv)
     return (unsigned short) tmp;
 }
 
+enum Command
+{
+    NONE,
+    GET,
+    HEAD
+};
 /**
- * @brief Get the response message based on client request message
+ * @brief Get the response message based on client request message into stringstream
  * 
  * @param response stringstream referaence for building response
  * @param buffer buffer with client request message
  */
 void get_response(std::stringstream& response, char *buffer)
 {
-    //requests
-    const char req_hostname[] = "GET /hostname";
-    const char req_cpu_name[] = "GET /cpu-name";
-    const char req_load[] = "GET /load";
-
     // response templates
     const char nl[] = "\r\n";
     const char OK_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\nContent-Length: ";
-    const char bad_request[] = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain;\r\n\r\n400 Bad Request";
-    const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain;\r\n\r\n500 Internal Server Error";
+    const char bad_request[] = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain;\r\nContent-Length: 15\r\n\r\n400 Bad Request";
+    const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain;\r\nContent-Length: 25\r\n\r\n500 Internal Server Error";
 
-    if (!strncmp(buffer, req_hostname, strlen(req_hostname)))
+    Command command = NONE;
+    char delim = ' ';
+    char *command_str = strtok(buffer, &delim);
+    if(command_str == nullptr)
+    {
+        command = NONE;
+    }
+    else if (!strcmp(command_str, "GET"))
+    {
+        command = GET;
+    }
+    else if (!strcmp(command_str, "HEAD"))
+    {
+        command = HEAD;
+    }
+
+    if (command == NONE)
+    {
+        response << bad_request;
+        return;
+    }
+
+
+    char *param_str = strtok(nullptr, &delim);
+    if(param_str == nullptr)
+    {
+        response << bad_request;
+    }
+    else if (!strcmp(param_str, "/hostname"))
     {
         string hostname;
         if(!get_hostname(&hostname))
@@ -193,10 +222,14 @@ void get_response(std::stringstream& response, char *buffer)
         }
         else
         {
-            response << OK_header << hostname.length() << nl << nl << hostname;
+            response << OK_header << hostname.length() << nl << nl;
+            if (command == GET)
+            {
+                response << hostname;
+            }
         }
     }
-    else if (!strncmp(buffer, req_cpu_name, strlen(req_cpu_name)))
+    else if (!strcmp(param_str, "/cpu-name"))
     {
         string cpu_name;
         if(!get_cpu_name(&cpu_name))
@@ -205,10 +238,14 @@ void get_response(std::stringstream& response, char *buffer)
         }
         else
         {
-            response << OK_header << cpu_name.length() << nl << nl << cpu_name;
-        }
+            response << OK_header << cpu_name.length() << nl << nl;
+            if (command == GET)
+            {
+                response << cpu_name;
+            }
+        }    
     }
-    else if (!strncmp(buffer, req_load, strlen(req_load)))
+    else if (!strcmp(param_str, "/load"))
     {
         int cpu_load = get_cpu_load();
         if(cpu_load < 0)
@@ -218,13 +255,19 @@ void get_response(std::stringstream& response, char *buffer)
         else
         { 
             string str_cpu_load = std::to_string(cpu_load) + "%";
-            response << OK_header << str_cpu_load.length() << nl << nl << str_cpu_load;
+            response << OK_header << str_cpu_load.length() << nl << nl;
+
+            if (command == GET)
+            {
+                response << str_cpu_load;
+            }
         }
     }
     else
     {
         response << bad_request;
     }
+    return;
 }
 
 #define DEFAULT 0
@@ -290,7 +333,7 @@ int main(int argc, char **argv)
         response.str("");
         get_response(response, buffer);
         string str_response = response.str();
-        send(comm_socket, str_response.c_str(), str_response.length() , 0 );
+        send(comm_socket, str_response.c_str(), str_response.length() , NONE );
 
         close(comm_socket);
     }
