@@ -169,7 +169,8 @@ enum Command
 {
     NONE,
     GET,
-    HEAD
+    HEAD,
+    NOT_IMPLEMENTED
 };
 /**
  * @brief Get the response message based on client request message into stringstream
@@ -182,6 +183,8 @@ void get_response(std::stringstream& response, char *buffer)
     // response templates
     const char nl[] = "\r\n";
     const char OK_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\nContent-Length: ";
+    const char not_found[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain;\r\nContent-Length: 13\r\n\r\n404 Not Found";
+    const char not_implemented[] = "HTTP/1.1 501 Not Implemented\r\nContent-Type: text/plain;\r\nContent-Length: 54\r\n\r\n501 Not Implemented: Server only supports HEAD and GET";
     const char bad_request[] = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain;\r\nContent-Length: 15\r\n\r\n400 Bad Request";
     const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain;\r\nContent-Length: 25\r\n\r\n500 Internal Server Error";
 
@@ -200,12 +203,38 @@ void get_response(std::stringstream& response, char *buffer)
     {
         command = HEAD;
     }
+    else if (!strcmp(command_str, "OPTIONS"))
+    {
+        command = NOT_IMPLEMENTED;
+    }
+    else if (!strcmp(command_str, "PUT"))
+    {
+        command = NOT_IMPLEMENTED;
+    }
+    else if (!strcmp(command_str, "POST"))
+    {
+        command = NOT_IMPLEMENTED;
+    }
+    else if (!strcmp(command_str, "DELETE"))
+    {
+        command = NOT_IMPLEMENTED;
+    }
+    else if (!strcmp(command_str, "PATCH"))
+    {
+        command = NOT_IMPLEMENTED;
+    }
 
     if (command == NONE)
     {
         response << bad_request;
         return;
     }
+    else if (command == NOT_IMPLEMENTED)
+    {
+        response << not_implemented;
+        return;
+    }
+    
 
 
     char *param_str = strtok(nullptr, delim);
@@ -269,7 +298,7 @@ void get_response(std::stringstream& response, char *buffer)
     }
     else
     {
-        response << bad_request;
+        response << not_found;
         return;
     }
 }
