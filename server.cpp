@@ -182,11 +182,11 @@ void get_response(std::stringstream& response, char *buffer)
 {
     // response templates
     const char nl[] = "\r\n";
-    const char OK_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\nContent-Length: ";
-    const char not_found[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain;\r\nContent-Length: 13\r\n\r\n404 Not Found";
-    const char not_implemented[] = "HTTP/1.1 501 Not Implemented\r\nContent-Type: text/plain;\r\nContent-Length: 54\r\n\r\n501 Not Implemented: Server only supports HEAD and GET";
-    const char bad_request[] = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain;\r\nContent-Length: 15\r\n\r\n400 Bad Request";
-    const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain;\r\nContent-Length: 25\r\n\r\n500 Internal Server Error";
+    const char OK_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: ";
+    const char not_found[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: 13\r\n\r\n404 Not Found";
+    const char not_implemented[] = "HTTP/1.1 501 Not Implemented\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: 54\r\n\r\n501 Not Implemented: Server only supports HEAD and GET";
+    const char bad_request[] = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: 15\r\n\r\n400 Bad Request";
+    const char internal_error[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: 25\r\n\r\n500 Internal Server Error";
 
     Command command = NONE;
     char delim[] = " ";
